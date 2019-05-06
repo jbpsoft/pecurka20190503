@@ -50,6 +50,7 @@
 		  	});
 
 	        $("#selection1" && "#selection2").change(function(){
+
 		        	$.post('/privremena-tabela',
 			        	{ 
 			        	  radnik: $("#selection1 option:selected").val(),
@@ -58,19 +59,28 @@
 	        });
 
 
-		  	$(".upisi").click(function(){
+		  	$("#upisi").click(function(){
+
+				var x=sessionStorage.getItem("radnikId");
+		        var y=sessionStorage.getItem("kupacId");
 
 		  		$.post('/privremena-tabela2',
 		        	{
-		        		id: $(this).data('id')/*,
-		        	  	Kolicina: $(this).val(),
-		        	  	Cena: $(this).val(),
-		        	  	zarRad: $(this).val() */
-		        	});/*,
-	           		function (response) {
-		              	location.reload(true);
-		            });*/
+		        	  	kolicina: $(this).val(),
+		        	  	Id: $(this).val(),
+		        	  	zarRad: $(this).val() 
+		        	});
 		  	});
+
+		  	$('#upisKolicineModal').on('show.bs.modal', function(e) {
+			    var Id = $(e.relatedTarget).data('id');
+			    $(e.currentTarget).find('input[name="Id"]').val(Id);
+			    var Product = $(e.relatedTarget).data('product');
+			    $(e.currentTarget).find('input[name="Product"]').val(Product);
+
+			});
+    
+            
 	    });
 		
 		
@@ -86,67 +96,84 @@
 	</style>
 </head>
 <body>
-	@include('pages/home')
-		<div id="main-zadRad">
-			<div id="datum"> {{ AdminOptions::lang(121, Session::get('jezik.AdminOptions::server()')) }}: {{ date('d.m.Y.') }}</div>		
-
-			<form  method="post">
-				<div style="padding: 25px 0 0 530px; font-size: 18pt;">				
-					<div class="form-group row">
-						<select id="selection1" class="form-group row" autocomplete="off">
-							<option value="0" selected>{{ AdminOptions::lang(115, Session::get('jezik.AdminOptions::server()')) }}:</option>
-							@foreach(DB::table('radnici')->get() as $radnik)
-							  	<option value="{{ $radnik->radnici_id }}">{{ $radnik->ime }} {{ $radnik->prezime }}</option>
-							@endforeach
-						</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;				
-						<select id="selection2" class="form-group row" autocomplete="off">
-							<option value="0" selected>{{ AdminOptions::lang(116, Session::get('jezik.AdminOptions::server()')) }}:</option>
-							@foreach(DB::table('kupci')->get() as $kupac)
-							  	<option value="{{ $kupac->id }}">{{ $kupac->naziv }}</option>
-							@endforeach
-						</select>
-					</div>
-				</div>
-			</form>
-			<div class="table-responsive table-hover">
-				<table id="myTable" class="table table-sm" style="max-width: 79%; float: right;">
-				  <thead">
-				    <tr>
-						<th>{{ 'Naziv proizvoda' }}</th>
-						<th>{{ 'Kolicina' }}</th>
-						<th>{{ 'Cena' }}</th>
-						<th>{{ 'Zarada radnika' }}</th>
-					</tr>
-				  </thead>
-				  <tbody >
-				    @foreach(DB::table('grupa_proizvoda')->get() as $key1 => $grupa)
-						<td><h5><b>{{ $grupa->naziv_grupe }}</b></h5></td>
-						@foreach(DB::table('proizvodi')->get() as $key2 => $proizvod)
-				    		@if($grupa->grupa_id == $proizvod->grupa_proizvoda)			    			
-					    		<tr>
-					    			<td><button data-id="{{ $proizvod->id }}" class="upisi btn btn-info" style="float: right; margin-right: 30px;">{{ $proizvod->naziv_proizvoda }}</button> </td>
-					    			<!-- <td>
-										<input style="text-align: center;" class="Kolicina" type="text" data-id="{{ $proizvod->id }}" name = 'Kolicina' size="7"  placeholder="Kg" autocomplete="off">			
-					    			</td>
-					    			<td>
-										<input style="text-align: center;" class="Cena" type="text" name = 'Cena' size="7" placeholder="{{ $proizvod->cena_proizvoda }}" autocomplete="off">
-									</td>
-									<td>
-										<input style="text-align: center;" class="zarRad" type="text" name = 'zarRad' size="7" placeholder="%" autocomplete="off">
-									</td> -->
-								</tr>										
-							@endif
+@include('pages/home')
+<div id="main-zadRad">	
+	@if (Session::has('success'))
+		<center><div class="alert alert-success" style="width: 250px;">{{ Session::get('success') }}</div></center>
+	@endif
+	<div id="datum"> 
+		{{ AdminOptions::lang(121, Session::get('jezik.AdminOptions::server()')) }}: {{ date('d.m.Y.') }}
+	</div>	
+	@if(empty($data))
+		<form  method="post">
+			<div style="padding: 25px 0 0 530px; font-size: 18pt;">				
+				<div class="form-group row">
+					<select id="selection1" class="form-group row" autocomplete="off">
+						<option value="0" selected>{{ AdminOptions::lang(115, Session::get('jezik.AdminOptions::server()')) }}:</option>
+						@foreach(DB::table('radnici')->get() as $radnik)
+						  	<option value="{{ $radnik->radnici_id }}">{{ $radnik->ime }} {{ $radnik->prezime }}</option>
 						@endforeach
-					@endforeach
-					
-				  </tbody>
-				</table>
+					</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;				
+					<select id="selection2" class="form-group row" autocomplete="off">
+						<option value="0" selected>{{ AdminOptions::lang(116, Session::get('jezik.AdminOptions::server()')) }}:</option>
+						@foreach(DB::table('kupci')->get() as $kupac)
+						  	<option value="{{ $kupac->id }}">{{ $kupac->naziv }}</option>
+						@endforeach
+					</select>
+				</div>
 			</div>
-		</div><br>
-		<!-- <div style="position: relative; float: right; padding-right: 76px;">
-			<button id="submit_button" type="button" class="btn btn-success waves-effect waves-light">{{ AdminOptions::lang(47, Session::get('jezik.AdminOptions::server()')) }}</button>
-	        <a href="/zaduzenje-radnika" type="button" class="btn btn-danger waves-effect waves-light">{{ AdminOptions::lang(21, Session::get('jezik.AdminOptions::server()')) }}</a>
-        </div> -->
-	
+		</form>
+	@else
+		<div>
+			Radnik:{{ $data3->ime }} {{ $data3->prezime }} Kupac:{{ $data5->naziv }}
+		</div>
+	@endif
+	<div class="table-responsive table-hover">
+		<table id="myTable" class="table table-sm" style="max-width: 79%; float: right; table-layout: fixed;">
+		  	<thead>
+			    <tr>
+					<th style="border-right: 2px solid black;">{{ 'Naziv proizvoda' }}</th>
+					<th>{{ 'Naziv proizvoda' }}</th>
+					<th>{{ 'Kolicina' }}</th>
+					<th>{{ 'Cena' }}</th>
+					<th>{{ 'Zarada radnika' }}</th>
+				</tr>
+		  	</thead>
+		  	<tbody >
+			    @foreach(DB::table('grupa_proizvoda')->get() as $key1 => $grupa)
+					<td style="border-right: 2px solid black;"><h5><b>{{ $grupa->naziv_grupe }}</b></h5></td>
+					@foreach(DB::table('proizvodi')->get() as $key2 => $proizvod)
+			    		@if($grupa->grupa_id == $proizvod->grupa_proizvoda)			    			
+				    		<tr>
+				    			<td style="border-right: 2px solid black;">
+				    				<button data-id="{{ $proizvod->cena_proizvoda }}" data-product="{{ $proizvod->id }}" data-target="#upisKolicineModal" data-toggle="modal" class="btn btn-danger" style="float: right; margin-right: 30px;">{{ $proizvod->naziv_proizvoda }}</button>
+				    			</td>
+				    			@if(!empty($data1))
+				    			<?php 
+				    			$povratni_podaci=DB::table('privremena_tabela')->where('proizvod_id',$data->proizvod_id)->first();?>
+					    			<td>
+										{{ DB::table('proizvodi')->where('proizvodi_id', $povratni_podaci->proizvod_id)->first()->naziv_proizvoda }}
+						            </td>
+						            <td>
+						                {{ $povratni_podaci->kolicina }}
+						            </td>
+						            <td>
+						                {{ $povratni_podaci->cena }}
+						            </td>
+						            <td>
+						                {{ $povratni_podaci->zarRad }}
+						            </td>				            
+								@endif
+							</tr>																
+						@endif
+					@endforeach
+				@endforeach			
+			</tbody>				
+		</table>
+	</div>
+</div>
+<div id="upisKolicineModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+@include('modals/live/upisKolicineModal')
+</div> 
 </body>
 </html>
