@@ -38,15 +38,6 @@ class HomeController extends BaseController {
 		return View::make('welcome');
 	}
 
-	public function litleTable(){
-		return View::make('litleTable');
-	}
-
-	public function bigTable(){
-		return View::make('bigTable');
-	}
-
-
 	public function home(){
 		return View::make('pages.home');
 	}

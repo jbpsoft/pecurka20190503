@@ -13,24 +13,25 @@ class ZaduzenjeController extends \BaseController {
 			$data->radnik = $_POST['radnik'];
 			$data->kupac = $_POST['kupac'];
 			$data->save();
-		
-		//$data->proizvod_id = $_POST['proizvod_id'];
-		
-
-		//$data1 = Radnici::zaduzeniRadnik($_POST['radnik']);
-		//$data2 = Buyers::zaduzeniKupac($_POST['kupac']);
-		Session::flash('success', 'success');
-		
-		//return View::make('pages.zaduzenjeRadnika', array('data1' => $data1, 'data2' => $data2));
-
 	}
 
 	public function privremena_tabela2(){
-			/*$data->kolicina = $_POST['Kolicina'];
-			$data->marza = $_POST['Cena'];
+		$data = new Privremena_tabela();
+			$data->kolicina = $_POST['kolicina'];
+			$data->cena = $_POST['Id'];
 			$data->zarRad = $_POST['zarRad'];
-			$data->update();*/
-			Session::flash('success', 'success');
+			$data->proizvod_id = $_POST['Product'];
+			$data->save();
+
+			$data1 = DB::table('proizvodi')->where('id', $_POST['Product'])->first();
+			$data2 = DB::table('privremena_tabela')->where('radnik', '<>', 0)->first();
+			$data3 = DB::table('radnici')->where('radnici_id', $data2->radnik)->first();
+			$data4 = DB::table('privremena_tabela')->where('kupac', '<>', 0)->first();
+			$data5 = DB::table('kupci')->where('id', $data4->kupac)->first();
+			
+			return View::make('pages.zaduzenjeRadnika', 
+								array('data'=> $data, 'data1'=> $data1, 'data3'=>$data3, 
+										'data5'=>$data5));
 	}
 	/**
 	 * Display a listing of the resource.

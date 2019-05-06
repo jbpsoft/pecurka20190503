@@ -1,10 +1,14 @@
 <?php	
-	class Privremena_tabela extends Eloquent {
+	class Ovlascenja extends Eloquent {
 
     protected $guarded = [];
 	
-	protected $table = 'privremena_tabela';
+	protected $table = 'ovlascenja';
 
     protected $primaryKey = 'id';
+/*
+    public function proizvodi(){
 
+        return $this->hasMany('grupa_proizvoda', 'grupa_proizvoda_id');
+    }*/
 }
